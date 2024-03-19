@@ -204,6 +204,20 @@ wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_pars
   return false
 end
 
+percent_encode_url = function(newurl)
+  result = string.gsub(
+    newurl, "(.)",
+    function (s)
+      local b = string.byte(s)
+      if b < 32 or b > 126 then
+        return string.format("%%%02X", b)
+      end
+      return s
+    end
+  )
+  return result
+end
+
 wget.callbacks.get_urls = function(file, url, is_css, iri)
   local urls = {}
   local html = nil
@@ -213,19 +227,6 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
 
   if abortgrab then
     return {}
-  end
-
-  local function percent_encode_url(newurl)
-    return string.gsub(
-      newurl, "(.)",
-      function (s)
-        local b = string.byte(s)
-        if b < 32 or b > 126 then
-          return string.format("%%%02X", b)
-        end
-        return s
-      end
-    )
   end
 
   local function decode_codepoint(newurl)
@@ -441,7 +442,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     and status_code < 300 then
     html = read_file(file)
     if string.match(url, "^https?://api%-beta%.taringa%.net/") then
-      json = cjson.decode(html)
+      json = cjson.decode(percent_encode_url(html))
       extract_from_json(json)
     end
     if string.match(url, "^https?://api%-beta%.taringa%.net/story/([0-9a-z]+)$") then
@@ -513,7 +514,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end
     if string.match(html, "^%s*{") then
       if not json then
-        json = cjson.decode(html)
+        json = cjson.decode(percent_encode_url(html))
       end
       extract_from_json(json)
       html = html .. flatten_json(json)
@@ -569,7 +570,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       retry_url = true
       return false
     end
-    local json = cjson.decode(html)
+    local json = cjson.decode(percent_encode_url(html))
   end
   if http_stat["statcode"] ~= 200 then
     retry_url = true
