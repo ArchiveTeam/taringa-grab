@@ -150,7 +150,8 @@ allowed = function(url, parenturl)
     ["^https?://www%.taringa%.net/([^%+][^%?&/]+)$"]="user",
     ["^https?://taringa%.net/[^/]+/.+_([0-9a-z][0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?)$"]="story",
     ["^https?://www%.taringa%.net/[^/]+/.+_([0-9a-z][0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?)$"]="story",
-    ["[%?&]commentId=([0-9a-z]+)"]="comment"
+    ["[%?&]commentId=([0-9a-z]+)"]="comment",
+    ["^https?://([^/]*t26%.net/.*)$"]="asset"
   }) do
     match = string.match(url, pattern)
     if match then
@@ -171,7 +172,8 @@ allowed = function(url, parenturl)
     return false
   end
   
-  if not string.match(url, "^https?://[^/]*taringa%.net/") then
+  if not string.match(url, "^https?://[^/]*taringa%.net/")
+    and not string.match(url, "^https?://[^/]*t26%.net/") then
     discover_item(discovered_outlinks, url)
   end
 
