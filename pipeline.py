@@ -72,7 +72,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20240320.08'
+VERSION = '20240320.09'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0'
 TRACKER_ID = 'taringa'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -280,7 +280,6 @@ class WgetArgs(object):
             '--warc-dedup-url-agnostic',
             '--warc-compression-use-zstd',
             '--warc-zstd-dict-no-include',
-            '--header', 'X-Forwarded-For: 84.238.194.2'
         ]
         dict_data = ZstdDict.get_dict()
         with open(os.path.join(item['item_dir'], 'zstdict'), 'wb') as f:
