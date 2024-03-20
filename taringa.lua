@@ -575,6 +575,14 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       return false
     end
     local json = cjson.decode(percent_encode_url(decode_codepoint(html)))
+  elseif string.match(url["url"], "^https?://[^/]*taringa%.net/") then
+    local html = read_file(http_stat["local_file"])
+    if not string.match(html, '"datePublished"')
+      or not string.match(html, '"author"') then
+      print("Got bad 200 response.")
+      retry_url = true
+      return false
+    end
   end
   if http_stat["statcode"] ~= 200 then
     retry_url = true
