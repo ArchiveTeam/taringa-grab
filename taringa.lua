@@ -86,7 +86,8 @@ find_item = function(url)
     ["^https?://api%-beta%.taringa%.net/c/([^/]+)/about$"]="channel",
     ["^https?://api%-beta%.taringa%.net/comment/([0-9a-z]+)$"]="comment",
     ["^https?://media%.taringa%.net/knn/identity/([^%?&]+)$"]="media",
-    ["^https?://[^/]*taringa%.net/tags/([^/%?&]+)$"]="tag"
+    ["^https?://[^/]*taringa%.net/tags/([^/%?&]+)$"]="tag",
+    ["^https?://[^/]*taringa%.net/%+([^/]+/[^%?&]+_[0-9a-z][0-9a-z]*[0-9a-z]*[0-9a-z]*[0-9a-z]*[0-9a-z]*)$"]="storyhtml"
   }) do
     value = string.match(url, pattern)
     type_ = name
@@ -141,6 +142,7 @@ allowed = function(url, parenturl)
   end
 
   local found = false
+  local skip = false
   for pattern, type_ in pairs({
     ["^https?://media%.taringa%.net/knn/[^/]+/([^%?&/]+)"]="media",
     ["^https?://[^/]+taringa%.net/tags/([^/%?&]+)"]="tag",
@@ -151,7 +153,8 @@ allowed = function(url, parenturl)
     ["^https?://taringa%.net/[^/]+/.+_([0-9a-z][0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?)$"]="story",
     ["^https?://www%.taringa%.net/[^/]+/.+_([0-9a-z][0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?[0-9a-z]?)$"]="story",
     ["[%?&]commentId=([0-9a-z]+)"]="comment",
-    ["^https?://([^/]*t26%.net/.*)$"]="asset"
+    ["^https?://([^/]*t26%.net/.*)$"]="asset",
+    ["^https?://[^/]*taringa%.net/%+([^/]+/[^%?&]+_[0-9a-z][0-9a-z]*[0-9a-z]*[0-9a-z]*[0-9a-z]*[0-9a-z]*)$"]="storyhtml"
   }) do
     match = string.match(url, pattern)
     if match then
@@ -159,8 +162,14 @@ allowed = function(url, parenturl)
       if new_item ~= item_name then
         discover_item(discovered_items, new_item)
         found = true
+        if type_ == "storyhtml" then
+          skip = true
+        end
       end
     end
+  end
+  if skip then
+    return false
   end
   --[[if found and item_type ~= "channel"
     and item_type ~= "user"
@@ -179,7 +188,8 @@ allowed = function(url, parenturl)
 
   for _, pattern in pairs({
     "[^0-9a-z]([0-9a-z]+)",
-    "([^%?&;/]+)"
+    "([^%?&;/]+)",
+    "^https?://[^/]*taringa%.net/%+([^/]+/[^%?&]+_[0-9a-z][0-9a-z]*[0-9a-z]*[0-9a-z]*[0-9a-z]*[0-9a-z]*)$"
   }) do
     for s in string.gmatch(url, pattern) do
       if ids[s] then
