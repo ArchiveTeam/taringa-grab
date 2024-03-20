@@ -451,7 +451,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       json = cjson.decode(html)
       check("https://www.taringa.net/+" .. json["channel"]["name"] .. "/" .. json["slug"])
       --check("https://api-beta.taringa.net/story/" .. item_value .. "/related?count=12")
-      check("https://api-beta.taringa.net/story/" .. item_value .. "/comments?sort=created-desc&count=50&repliesCount=10&repliesSort=created-asc&page=0&after=")
+      if json["comments"] > 0 then
+        check("https://api-beta.taringa.net/story/" .. item_value .. "/comments?sort=created-desc&count=50&repliesCount=10&repliesSort=created-asc&page=0&after=")
+      end
     end
     if string.match(url, "/story/[0-9a-z]+/comments%?")
       or string.match(url, "/user/[^/]+/comments%?")
